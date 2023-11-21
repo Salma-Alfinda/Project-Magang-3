@@ -1,0 +1,50 @@
+name: Build Publish Pull 
+
+on:
+  push:
+    branches: "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  publish:
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Log in to GitHub Container Registry (GHCR)
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull from GHCR and Push to Server VM
+        run: |
+          docker pull ghcr.io/${{ github.repository }}:${{ github.sha }}
+          # Add additional steps for pushing to server VM
+
+  pull:
+    needs: [publish]
+    runs-on: self-hosted
+    steps:
+      - name: Pull from GHCR on Server VM
+        run: docker pull ghcr.io/${{ github.repository }}:${{ github.sha }}
+        # Add additional steps for running the pulled image on the server VM
