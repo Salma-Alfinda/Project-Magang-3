@@ -20,8 +20,7 @@ jobs:
         node-version: '18'
 
     - name: Build Docker Image
-      run: docker build -t ghcr.io/salma-alfinda/tugas-gather1:91cd7a298cfd5f47ac9e2fbdb7a724517a534139 .
-
+      run: docker build -t ghcr.io/salma-alfinda/tugas-gather1:${{ github.sha }} .
 
   push:
     needs: build
@@ -29,10 +28,7 @@ jobs:
 
     steps:
     - name: Log in to GitHub Container Registry (GHCR)
-      run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Push Docker Image
-      run: docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
-
-    - name: Clean up Docker images
-      run: docker image rm ghcr.io/${{ github.repository }}:${{ github.sha }}
+      run: docker push ghcr.io/salma-alfinda/tugas-gather1:${{ github.sha }}
