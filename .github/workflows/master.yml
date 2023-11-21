@@ -20,7 +20,8 @@ jobs:
         node-version: '18'
 
     - name: Build Docker Image
-      run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
+      run: docker build -t ghcr.io/Salma-Alfinda/tugas-gather1:91cd7a298cfd5f47ac9e2fbdb7a724517a534139 .
+
 
   push:
     needs: build
