@@ -28,7 +28,7 @@ jobs:
 
     steps:
     - name: Log in to GitHub Container Registry (GHCR)
-      run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+      run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GATHER_TOKEN }}
 
     - name: Push Docker Image
       run: docker push ghcr.io/salma-alfinda/tugas-gather1:${{ github.sha }}
