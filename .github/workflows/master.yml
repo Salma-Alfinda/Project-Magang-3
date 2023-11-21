@@ -5,30 +5,20 @@ on:
     branches:
       - main
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        distribution: 'adopt'
-        node-version: '18'
-
-    - name: Build Docker Image
-      run: docker build -t ghcr.io/salma-alfinda/tugas-gather1:latest .
-
-  push:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Log in to GitHub Container Registry (GHCR)
-      run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GATHER_TOKEN }}
-
-    - name: Push Docker Image
-      run: docker push ghcr.io/salma-alfinda/tugas-gather1:latest
+      jobs:
+        docker_publish:
+          runs-on: "ubuntu-20.04"
+      
+          steps:
+            - uses: actions/checkout@v2
+      
+            # https://github.com/marketplace/actions/push-to-ghcr
+            - name: Build and publish a Docker image for ${{ github.repository }}
+              uses: macbre/push-to-ghcr@master
+              with:
+                image_name: ${{  }}  # it will be lowercased internally
+                github_token: ${{ secrets.GATHER_TOKEN }}
+                # optionally push to the Docker Hub (docker.io)
+                # docker_io_token: ${{ secrets.DOCKER_IO_ACCESS_TOKEN }}  # see https://hub.docker.com/settings/security
+                # customize the username to be used when pushing to the Docker Hub
+                # docker_io_user: foobar  # see https://github.com/macbre/push-to-ghcr/issues/14
