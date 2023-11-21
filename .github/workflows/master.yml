@@ -12,11 +12,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           distribution: 'adopt'
-          java-version: '11'
+          modeversion: '18'
 
       - name: Build with Gradle
         run: ./gradlew build
