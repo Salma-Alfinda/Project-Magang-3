@@ -6,15 +6,31 @@ on:
       - main
 
 jobs:
-        docker_publish:
-          runs-on: "ubuntu-20.04"
-      
-          steps:
-            - uses: actions/checkout@v2
-      
-            # https://github.com/marketplace/actions/push-to-ghcr
-            - name: Build and publish a Docker image for ${{ github.repository }}
-              uses: macbre/push-to-ghcr@master
-              with:
-                image_name: ${{ github.repository }}  # it will be lowercased internally
-                github_token: ${{ secrets.GATHER_TOKEN }}
+  build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build Docker Image
+        run: docker build -t ghcr.io/salma-alfinda/tugas-gather1:latest .
+
+      - name: Log in ke GitHub Container Registry (GHCR)
+        run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GATHER-TOKEN }}
+
+      - name: Push Docker Image ke GHCR
+        run: docker push ghcr.io/salma-alfinda/tugas-gather1:latest
+
+  pullimage:
+    needs: build-push
+    runs-on: self-hosted
+
+    steps:
+      - name: Pull
+        run: docker pull ghcr.io/salma-alfinda/tugas-gather1:latest
