@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Perintah untuk menjalankan aplikasi ketika kontainer dijalankan
-CMD ["npm", "start"]
+CMD ["npm", "start", "--", "--host", "0.0.0.0"]
