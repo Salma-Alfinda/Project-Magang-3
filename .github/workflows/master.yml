@@ -1,4 +1,4 @@
-name: Build and Push to GHCR
+name: Build Push Pull
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
-  build-push:
+  buildpush:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v2
 
       - name: Set up Node.js
@@ -18,19 +18,31 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Build Docker Image
-        run: docker build -t ghcr.io/salma-alfinda/tugas-gather1:${{ github.run_number }} .
+      - name: Build
+        run: docker build -t ghcr.io/kurniawanfaridjadmiko/tugasmagang2:${{ github.run_number }} .
 
-      - name: Log in ke GitHub Container Registry (GHCR)
+      - name: Log in
         run: docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GATHER_TOKEN }}
 
-      - name: Push Docker Image ke GHCR
-        run: docker push ghcr.io/salma-alfinda/tugas-gather1:${{ github.run_number }}
+      - name: Push
+        run: docker push ghcr.io/kurniawanfaridjadmiko/tugasmagang2:${{ github.run_number }}
 
-  pullimage:
-    needs: build-push
+  pull:
+    needs: buildpush
     runs-on: self-hosted
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: Pull
-        run: docker pull ghcr.io/salma-alfinda/tugas-gather1:${{ github.run_number }}
+        run: docker pull ghcr.io/kurniawanfaridjadmiko/tugasmagang2:${{ github.run_number }}
+
+      - name: Deploy with Docker Compose
+        run: |
+          docker compose pull
+          docker compose up --force-recreate --build -d
+          docker image prune -f
+
+      - name: Clean up
+        run: docker compose down
